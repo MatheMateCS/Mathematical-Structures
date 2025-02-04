@@ -47,7 +47,7 @@ void Rational::reduce() {
     this->denominator /= gcd;
 }
 
-void Rational::reverse() {
+void Rational::inverse() {
     Integer new_numerator;
     Natural new_denominator;
     switch (Math::sign(this->numerator)) {
@@ -79,7 +79,7 @@ double Rational::cast() const {
     return static_cast<Real>(this->numerator) / this->denominator;
 }
 
-Rational & Rational::operator=(const std::pair<int, unsigned int> &frac) {
+Rational & Rational::operator=(const std::pair<Integer, Natural> &frac) {
     this->numerator = frac.first;
     this->denominator = frac.second;
     return *this;
@@ -113,32 +113,8 @@ Rational & Rational::operator*= (const Rational &rhs) {
 }
 
 Rational & Rational::operator/= (Rational rhs) {
-    rhs.reverse();
+    rhs.inverse();
     this->operator*=(rhs);
-    return *this;
-}
-
-Rational & Rational::operator+= (const std::pair<Integer, Natural> &frac) {
-    const Rational rhs(frac);
-    this->operator+=(rhs);
-    return *this;
-}
-
-Rational & Rational::operator-= (const std::pair<int, unsigned int> &frac) {
-    const Rational rhs(frac);
-    this->operator-=(rhs);
-    return *this;
-}
-
-Rational & Rational::operator*= (const std::pair<int, unsigned int> &frac) {
-    const Rational rhs(frac);
-    this->operator*=(rhs);
-    return *this;
-}
-
-Rational & Rational::operator/= (const std::pair<int, unsigned int> &frac) {
-    const Rational rhs(frac);
-    this->operator/=(rhs);
     return *this;
 }
 
@@ -149,7 +125,7 @@ Rational operator* (const Rational &lhs, const Rational &rhs)  {
 }
 
 Rational operator/ (const Rational &lhs, Rational rhs) {
-    rhs.reverse();
+    rhs.inverse();
     Rational res = lhs * rhs;
     res.reduce();
     return res;
@@ -178,3 +154,53 @@ Rational operator- (const Rational &lhs, const Rational &rhs) {
     return res;
 }
 
+Matrix::Matrix(): Matrix(1, 1) {}
+
+Matrix::Matrix(const Natural &m, const Natural &n) : dimension(m, n) {
+    this->data = new Real* [this->dimension.m];
+    for (Natural i = 0; i < this->dimension.m; ++i) {
+        this->data[i] = new Real [this->dimension.n];
+    }
+}
+
+Matrix::Matrix(const Dimension &dim) : Matrix(dim.m, dim.n) {}
+
+Matrix::Matrix(const Matrix &matrix) : Matrix(matrix.dimension.m, matrix.dimension.n) {
+    for (Natural i = 0; i < this->dimension.m; ++i) {
+        for (Natural j = 0; j < this->dimension.n; ++j) {
+            this->data[i][j] = matrix.data[i][j];
+        }
+    }
+}
+
+void Matrix::transpose() {
+    Matrix T(this->dimension.n, this->dimension.m);
+    for (Natural i = 0; i < T.dimension.m; ++i) {
+        for (Natural j = 0; j < T.dimension.n; ++j) {
+            T[{i, j}] = this->data[j][i];
+        }
+    }
+    *this = T;
+}
+
+Matrix Matrix::T() const {
+    Matrix T(this->dimension.n, this->dimension.m);
+    for (Natural i = 0; i < T.dimension.m; ++i) {
+        for (Natural j = 0; j < T.dimension.n; ++j) {
+            T[{i, j}] = this->data[j][i];
+        }
+    }
+    return T;
+}
+
+Matrix::Dimension Matrix::dim() {
+    return this->dimension;
+}
+
+Real & Matrix::operator[](const std::pair<Natural, Natural> &pos) {
+    return this->data[pos.first][pos.second];
+}
+
+Real Matrix::operator()(const Natural &i, const Natural &j) const {
+    return this->data[i][j];
+}
