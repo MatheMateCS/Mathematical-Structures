@@ -1,90 +1,73 @@
 #ifndef MATH_H
 #define MATH_H
 
-class Number;
-class R;
-class Q;
-class Z;
-class N;
+#include <fstream>
+#include <utility>
+class Rational;
 
-class Number {
-protected:
-    explicit Number(const double& value) : value(value) {}
-private:
-    double value;
-};
+#define MATH_MODE 1
 
-class R : public Number {}; // Real
+#if MATH_MODE == 1
 
+#define Boolean bool
+#define Natural unsigned int
+#define Integer int
+#define Rational Rational
+#define Real double
 
-class Z : public Number { // Integer
+#endif
+
+namespace Math {
+    inline Real abs(const Real& a) {
+        if (a < 0) return -1 * a;
+        return a;
+    }
+
+    inline Integer gcd(const Integer& a, const Integer& b) {
+        if (a == 0) return b;
+        if (b == 0) return a;
+        return gcd(b, a % b);
+    }
+
+    inline Integer lcm(const Integer& a, const Integer& b) {
+        return static_cast<Integer>(abs(a * b)) / gcd(a, b);
+    }
+}
+
+class Rational {
 public:
-    Z() : Z(0) {}
-
-    Z(int integer) : Number(integer) {
-        this->value = integer;
+    Rational() {
+        this->numerator = 0;
+        this->denominator = 1;
     }
 
-    Z(const Z& integer) : Number(integer.value) {
-        this->value = integer.value;
-    }
-
-    Z& operator= (const int& value) {
-        this->value = value;
-        return *this;
-    }
-
-    Z& operator= (const Z& integer) {
-        this->value = integer.value;
-        return *this;
-    }
-
-private:
-    int value;
-};
-
-class N : public Number { // Natural
-public:
-    N() : N(0) {}
-
-    N(unsigned int natural) : Number(natural) {
-        this->value = natural;
-    }
-
-    N(const N& natural) : Number(natural.value) {
-        this->value = natural.value;
-    }
-
-    N& operator= (const unsigned int& value) {
-        this->value = value;
-        return *this;
-    }
-
-    N& operator= (const N& natural) {
-        this->value = natural.value;
-        return *this;
-    }
-private:
-    unsigned int value;
-};
-
-class Q : public Number { // Rational
-public:
-    Q() : Q(0, 1) {}
-
-    Q(int numerator, unsigned int denominator) : Number(static_cast<double>(numerator) / denominator) {
+    Rational(const Integer& numerator, const Natural& denominator) {
         this->numerator = numerator;
         this->denominator = denominator;
     }
 
-    Q(const Q& rational) {
-        this->numerator = rational.numerator;
-        this->denominator = rational.denominator;
+    Rational(const Rational& rat) {
+        this->numerator = rat.numerator;
+        this->denominator = rat.denominator;
+    }
+
+    Rational& operator= (const Rational& rat) = default;
+
+    Rational& operator= (const std::pair<Integer, Natural>& pair) {
+        this->numerator = pair.first;
+        this->denominator = pair.second;
+        return *this;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Rational& rat) {
+        os << rat.numerator << "/" << rat.denominator;
+        return os;
     }
 private:
-    Z numerator;
-    N denominator;
+    Integer numerator;
+    Natural denominator;
 };
+
 
 
 #endif //MATH_H
