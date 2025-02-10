@@ -2,6 +2,7 @@
 #define MATH_H
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <utility>
 
@@ -17,6 +18,8 @@ typedef unsigned int Natural;
 typedef int Integer;
 typedef Rational Rational;
 typedef double Real;
+
+typedef std::function<Real(const Real&)> Function;
 
 #define INF INT_MAX
 
@@ -92,6 +95,9 @@ private:
     Real** data;
 };
 
+Function linear(Real k, Real b);
+
+Function quadratic(Real a, Real b, Real c);
 
 
 #endif //MATH_H

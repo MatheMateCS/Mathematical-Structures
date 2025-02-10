@@ -204,3 +204,12 @@ Real & Matrix::operator[](const std::pair<Natural, Natural> &pos) {
 Real Matrix::operator()(const Natural &i, const Natural &j) const {
     return this->data[i][j];
 }
+
+Function linear(Real k, Real b) {
+    return [k, b] (const Real& x) -> Real { return k * x + b; };
+}
+
+Function quadratic(Real a, Real b, Real c) {
+    return [a, b, c] (const Real& x) -> Real { return a * x * x + b * x + c; };
+}
+
